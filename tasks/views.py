@@ -14,3 +14,6 @@ def contact(recquest):
 
 def show_details(request):
     return HttpResponse("This is Show Details section")
+
+def show_specific_task(request,id):
+    return HttpResponse("This is Show Specific Task section")
