@@ -6,14 +6,24 @@ from django.http import HttpResponse
     # Transform data
     # Data pass
     # Http response / Json response
-def home(request):
-    return HttpResponse("Welcome to the task management")
+# def home(request):
+#     return HttpResponse("Welcome to the task management")
     
-def contact(recquest):
-    return HttpResponse("This is Contact page")
+# def contact(recquest):
+#     return HttpResponse("This is Contact page")
 
-def show_details(request):
-    return HttpResponse("This is Show Details section")
+# def show_details(request):
+#     return HttpResponse("This is Show Details section")
 
-def show_specific_task(request,id):
-    return HttpResponse("This is Show Specific Task section")
+# def show_specific_task(request,id):
+#     return HttpResponse("This is Show Specific Task section")
+
+# ----------------------------------------------------RIGHT WAY TO WRITE THE CODE-----------------------------------------
+def dash_board(request):
+    return render(request,"dashboard/manager_dashboard.html")
+
+def test(request):
+    context = {
+        "names":["Mahmud"]
+    }
+    return render(request,"test.html",context)
