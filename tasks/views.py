@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from tasks.forms import TaskForm,TaskModelForm
+from tasks.forms import TaskForm,TaskModelForm,TaskModelFormPrac
 from tasks.models import Employee,Task
 
 # Create your views here.
@@ -31,7 +31,7 @@ def test(request):
     return render(request,"test.html",context)
 
 def create_task(request):
-    employees = Employee.objects.all()
+    # employees = Employee.objects.all()
     form = TaskModelForm()
     if(request.method == 'POST'):
         form = TaskModelForm(request.POST)
@@ -57,3 +57,15 @@ def create_task(request):
                 
     context = {"form": form}
     return render(request,"task_form.html",context)
+
+#PRACTICE
+def create_task_prac(request):
+    form = TaskModelFormPrac()
+    if(request.method=='POST'):
+        form = TaskModelFormPrac(request.POST)
+        if form.is_valid():
+            form.save()
+            
+            return render(request,'task_form_prac.html',{'form':form,'message':'Task Added Succefully'})
+            
+    return render(request,'task_form_prac.html',{'form':form})

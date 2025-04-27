@@ -1,7 +1,7 @@
 from django import forms
 from tasks.models import Task
 
-#Django Form            
+#Django Form NO NEED THIS IS BASIC           
 class TaskForm(forms.Form):
     title = forms.CharField(max_length=250)
     discription = forms.CharField(widget=forms.Textarea,label="Description")
@@ -12,7 +12,8 @@ class TaskForm(forms.Form):
         employees = kwargs.pop("employees",[])
         super().__init__(*args,**kwargs) 
         self.fields["assign_to"].choices = [(emp.id,emp.name) for emp in employees]           
-            
+ 
+# MIXIN           
 class StyleFormMixin:
     
     default_classes = "border-2 border-gray-300 w-full rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500"
@@ -54,7 +55,7 @@ class TaskModelForm(StyleFormMixin,forms.ModelForm):
         }
         
         
-        '''MANUAL WIDGET'''
+        '''MANUAL WIDGET NO NEED THIS IS BASIC'''
         # widgets = {
         #     'title':forms.TextInput(attrs={
         #         'class':"border-2 border-gray-300 w-full rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500",
@@ -76,4 +77,45 @@ class TaskModelForm(StyleFormMixin,forms.ModelForm):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.apply_style_widget()
+  
+  
+#MIXIN PRSCTICE
+class styleMixin:
+    
+    default_classess = "border-2 border-gray-300 w-full rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500"
+    def add_style(self):
+        for fieldname,field in self.fields.items():
+            if isinstance(field.widget,forms.TextInput):
+                field.widget.attrs.update({
+                    'class':self.default_classess,
+                    'placeholder':f'Enter {field.label.lower()}'
+                })
+            elif isinstance(field.widget,forms.Textarea):
+                field.widget.attrs.update({
+                    'class':self.default_classess,
+                    'placeholder':f"Enter {field.label.lower()}"
+                })
+            elif isinstance(field.widget,forms.SelectDateWidget):
+                field.widget.attrs.update({
+                    'class':self.default_classess
+                })
+            elif isinstance(field.widget,forms.CheckboxSelectMultiple):
+                field.widget.attrs.update({
+                    'class':self.default_classess
+                })
+        
+              
+        
+#TASK MODEL FORM PRACTICE
+class TaskModelFormPrac(styleMixin,forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['title','discription','due_date','assign_to']
+        widgets={
+            'due_date':forms.SelectDateWidget,
+            'assign_to':forms.CheckboxSelectMultiple
+        }
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.add_style()
     
