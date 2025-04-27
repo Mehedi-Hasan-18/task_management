@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        {% comment %} {{task_count.num_task}} {% endcomment %}
+        <ul>
+            {% for task in tasks %}
+            <li>
+                {% comment %} {% for t in task.task_set.all %}
+                {{t.title}}
+                {% endfor %} {% endcomment %}
+                {% comment %} {{task.task.title}} {% endcomment %}
+                 {% for emp in task.assign_to.all %}
+                 {{emp.name}}
+                 {% endfor %}
+            </li>
+            <li>
+                {% comment %} {{task.project.name}} {% endcomment %}
+                {% comment %} {{task.name}} {% endcomment %}
+                 {{task.title}}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% comment %} <div>
+        {{task1}}
+    </div> {% endcomment %}
+
+    <div>
+        {{projects}}
+        <ul>
+            {% for project in projects %}
+            <li>
+               <p>{{project.name}} </p> 
+               <p>{{project.num_task}} </p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
