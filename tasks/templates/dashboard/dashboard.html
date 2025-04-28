@@ -14,6 +14,7 @@
 
         {% comment %} tailwind {% endcomment %}
         <link rel="stylesheet" href="{% static "css/output.css" %}">
+        <script src="https://cdn.tailwindcss.com"></script>
         <style>
             body{
                 font-family: "Inter",sans-serif;
@@ -45,11 +46,13 @@
         {% comment %} card {% endcomment %}
         <main>
             <div class="grid grid-cols-4 gap-5 mt-6 mb-8">
+                {% comment %} TOTAL TASK {% endcomment %}
+                <a href="{% url "manager-dashboard" %}?type=all">
                 <div
                     class="bg-white rounded-lg p-5 flex justify-between items-center shadow-md">
                     <div>
                         <h2>Total Task</h2>
-                        <h1 class="font-bold text-2xl pt-3">3</h1>
+                        <h1 class="font-bold text-2xl pt-3">{{Count.total_task}}</h1>
                         <p>111 last month</p>
                     </div>
                     <div class="bg-red-200 rounded-full p-3"><svg
@@ -61,11 +64,15 @@
                         </svg>
                     </div>
                 </div>
+                </a>
+                {% comment %} COMPLETED TASK {% endcomment %}
+
+                <a href="{% url 'manager-dashboard'%}?type=completed ">
                 <div
                     class="bg-white rounded-lg p-5 flex justify-between items-center shadow-md">
                     <div>
-                        <h2>Total Task</h2>
-                        <h1 class="font-bold text-2xl pt-3">3</h1>
+                        <h2>Completed Task</h2>
+                        <h1 class="font-bold text-2xl pt-3">{{Count.completed_task}} </h1>
                         <p>111 last month</p>
                     </div>
                     <div class="bg-green-200 rounded-full p-3"><svg
@@ -77,11 +84,13 @@
                         </svg>
                     </div>
                 </div>
+                </a>
+                <a href="{% url 'manager-dashboard'%}?type=pending">
                 <div
                     class="bg-white rounded-lg p-5 flex justify-between items-center shadow-md">
                     <div>
-                        <h2>Total Task</h2>
-                        <h1 class="font-bold text-2xl pt-3">3</h1>
+                        <h2>Pending Task</h2>
+                        <h1 class="font-bold text-2xl pt-3">{{Count.pending_task}}</h1>
                         <p>111 last month</p>
                     </div>
                     <div class="bg-purple-200 rounded-full p-3"> <svg
@@ -93,11 +102,13 @@
                         </svg>
                     </div>
                 </div>
+                </a>
+                <a href="{% url "manager-dashboard" %}?type=in_progress">
                 <div
                     class="bg-white rounded-lg p-5 flex justify-between items-center shadow-md">
                     <div>
-                        <h2>Total Task</h2>
-                        <h1 class="font-bold text-2xl pt-3">3</h1>
+                        <h2>In Progress</h2>
+                        <h1 class="font-bold text-2xl pt-3">{{Count.in_progress}}</h1>
                         <p>111 last month</p>
                     </div>
                     <div class="bg-blue-200 rounded-full p-3"><svg
@@ -109,6 +120,7 @@
                         </svg>
                     </div>
                 </div>
+                </a>
             </div>
             {% block tasks %}
 
