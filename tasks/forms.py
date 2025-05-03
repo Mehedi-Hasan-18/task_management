@@ -15,6 +15,9 @@ class TaskForm(forms.Form):
  
 # MIXIN           
 class StyleFormMixin:
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.apply_style_widget()
     
     default_classes = "border-2 border-gray-300 w-full rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500"
     
@@ -82,7 +85,11 @@ class TaskModelForm(StyleFormMixin,forms.ModelForm):
 #MIXIN PRSCTICE
 class styleMixin:
     
-    default_classes = "block w-full border-2 border-gray-300 rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500"
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.add_style()
+    
+    default_classes = "block w-full border-2 border-gray-300 rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500 mt2 mb-3"
     def add_style(self):
         for fieldname,field in self.fields.items():
             if isinstance(field.widget,forms.TextInput):
@@ -103,6 +110,10 @@ class styleMixin:
                 field.widget.attrs.update({
                     'class':self.default_classes
                 })
+            elif isinstance(field.widget,forms.CharField):
+                field.widget.attrs.update({
+                    'class':self.default_classes
+                })
         
               
         
@@ -115,15 +126,13 @@ class TaskModelFormPrac(styleMixin,forms.ModelForm):
             'due_date':forms.SelectDateWidget,
             'assign_to':forms.CheckboxSelectMultiple
         }
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.add_style()
+    # def __init__(self,*args,**kwargs):
+    #     super().__init__(*args,**kwargs)
+    #     self.add_style()
         
 class TaskDetailModelForm(styleMixin,forms.ModelForm):
     class Meta:
         model = TaskDetail
         fields = ['priority','notes']
         
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.add_style()
+    

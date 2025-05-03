@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+</head>
+<body class="w-11/12 mx-auto">
+    <h1>This Is Register Page</h1>
+    <div>
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                {{error}}
+            {% endfor %}
+        {% endif %}
+        <form action="" method='POST'>
+            {% csrf_token %}
+            {% for field in form %}
+                <p>
+                    
+                    <label for="{{field.id_for_label}}">{{field.label}} </label>
+                    {{field}}
+
+                    {% if field.errors %}
+                        <ul>
+                            {% for error in field.errors %}
+                                <li>{{error}}</li>
+                            {% endfor %}
+                        </ul>
+                        
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <button class="btn bg-amber-600" type='submit'>Submit</button>
+        </form>
+    </div>
+</body>
+</html>
