@@ -2,3 +2,4 @@ task_env/
 __pycache__/
 dp.sqlite3
 node_modules
+.env
