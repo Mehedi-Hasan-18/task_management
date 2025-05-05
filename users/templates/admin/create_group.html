@@ -1,0 +1,18 @@
+{% extends "admin/dashboard.html" %}
+{% block content %}
+    <div class="bg-green-500 text-black w-11/12">
+        {% if messages %}
+            {% for message in messages %}
+                {{message}}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="flex justify-center items-center m-5 p-5 font-bold text-2xl">
+        <form method='POST'>
+            {% csrf_token %}
+            {{form}}
+
+            <button class="bg-red-400 text-black m-3 p-3 rounded" type='submit'>Submit</button>
+        </form>
+    </div>
+{% endblock content %}

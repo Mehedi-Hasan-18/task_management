@@ -1,12 +1,18 @@
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
-from users.forms import RegisterForm,CustomRegisterForm,CustomSignInForm
+from users.forms import RegisterForm,CustomRegisterForm,CustomSignInForm,AssignRoleForm,CreateGroupForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.decorators import login_required,user_passes_test
 
 # Create your views here.
+# test function
+def is_admin(user):
+    return user.groups.filter(name='Admin').exists()
+
+
 def register(request):
     # form = RegisterForm()
     form = CustomRegisterForm()
@@ -42,7 +48,7 @@ def signOut(request):
         return redirect('signIn')
     return render(request,'home.html')
 
-
+@login_required
 def active(request,user_id,token):
     try:
         user = User.objects.get(id=user_id)
@@ -54,3 +60,45 @@ def active(request,user_id,token):
             return HttpResponse("INVALID USERNAME OR TOKEN")
     except User.DoesNotExist:
         return HttpResponse("USER DOES NOT EXIST")
+    
+@user_passes_test(is_admin,login_url='no-permission')    
+def admin_dashboard(request):
+    users = User.objects.prefetch_related('groups').all()
+    
+    for user in users:
+        if user.groups.exists():
+            user.group_name = user.groups.first().name
+        else:
+            user.group_name = 'NO Group Assign'
+        
+    return render(request,'admin/dashboard.html', {'users':users})
+
+@user_passes_test(is_admin,login_url='no-permission')  
+def assign_role(request,user_id):
+    user = User.objects.get(id=user_id)
+    form = AssignRoleForm()
+    if request.method == 'POST':
+        form = AssignRoleForm(request.POST)
+        if form.is_valid():
+            role = form.cleaned_data.get('role')
+            user.groups.clear()
+            user.groups.add(role)
+            messages.success(request, f'Role Changed Done for {user.username}')
+            return redirect('admin_dashboard')
+    return render(request, 'admin/assign_role.html', {'form':form})
+
+@user_passes_test(is_admin,login_url='no-permission')  
+def create_group(request):
+    form = CreateGroupForm()
+    if request.method == 'POST':
+        form = CreateGroupForm(request.POST)
+        if form.is_valid():
+            group = form.save()
+            messages.success = f'Group Created SuccessFul'
+        return redirect('admin_dashboard')
+    return render(request,'admin/create_group.html', {'form':form})
+
+@user_passes_test(is_admin,login_url='no-permission') 
+def group_list(request):
+    groups = Group.objects.prefetch_related('permissions')
+    return render(request,'admin/group_list.html', {'groups':groups})

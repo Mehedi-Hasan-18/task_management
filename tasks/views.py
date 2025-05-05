@@ -4,6 +4,7 @@ from tasks.forms import TaskForm,TaskModelForm,TaskModelFormPrac,TaskDetailModel
 from tasks.models import Employee,Task,TaskDetail,Project
 from django.db.models import Q,Count
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required,user_passes_test,permission_required
 
 # Create your views here.
     #Work with database
@@ -23,6 +24,12 @@ from django.contrib import messages
 #     return HttpResponse("This is Show Specific Task section")
 
 # ----------------------------------------------------RIGHT WAY TO WRITE THE CODE-----------------------------------------
+def is_manager(user):
+    return user.groups.filter(name='Manager').exists()
+
+def is_employee(user):
+    return user.groups.filter(name='Employee').exists()
+
 def dash_board(request):
     type = request.GET.get('type','all')
     #GETTING TASK COUNT
@@ -69,6 +76,8 @@ def test(request):
     }
     return render(request,"test.html",context)
 
+@login_required(login_url='signIn')
+@permission_required('tasks.add_task', login_url='signIn')
 def create_task(request):
     task_form = TaskModelForm()
     task_detail_form = TaskDetailModelForm()
@@ -88,6 +97,9 @@ def create_task(request):
     context = {"task_form": task_form,"task_Detail":task_detail_form}
     return render(request,"task_form.html",context)
 
+
+@login_required
+@permission_required('tasks.add_task', login_url='no-permission')
 def update_task(request,id):
     task = Task.objects.get(id=id)
     task_form = TaskModelForm(instance= task)
@@ -111,6 +123,8 @@ def update_task(request,id):
     context = {"task_form": task_form,"task_Detail":task_detail_form}
     return render(request,"task_form.html",context)
 
+@login_required
+@permission_required('tasks.add_task', login_url='no-permission')
 def delete_task(request,id):
     if request.method=='POST':
         task = Task.objects.get(id=id)
@@ -122,6 +136,8 @@ def delete_task(request,id):
         messages.error(request,"Something Wrong")
         return redirect("manager-dashboard")
 
+@login_required
+@permission_required('tasks.add_task', login_url='no-permission')
 def view_task(request):
     #RETRIVE ALL DATA
     # tasks = Task.objects.all()
