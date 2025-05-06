@@ -1,51 +1,6 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}{% endblock title %}</title>
-        
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-            rel="stylesheet">
-
-        {% comment %} tailwind {% endcomment %}
-        <link rel="stylesheet" href="{% static "css/output.css" %}">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <style>
-            body{
-                font-family: "Inter",sans-serif;
-            }
-        </style>
-    </head>
-    <body class="bg-gray-100  w-11/12 mx-auto">
-        {% comment %} <!-- header --> {% endcomment %}
-        <header
-            class="flex justify-between mt-10 text-2xl item-center">
-            <div>
-                <h2 class="font-bold">Dashboard</h2>
-            </div>
-            <div class="flex justify-between gap-5 item-center">
-                <button class="hover:bg-gray-500 relative p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor"
-                        class="size-7">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                    </svg>
-                </button>
-                <button
-                    class="font-bold bg-blue-600 rounded-full w-10 h-10 text-white">B</button>
-
-            </div>
-        </header>
-        {% comment %} card {% endcomment %}
-        <main>
-            <div class="grid grid-cols-4 gap-5 mt-6 mb-8">
+{% extends "base.html" %}
+{% block content %}
+            <div class="grid grid-cols-4 gap-5 mt-6 mb-8 w-11/12 mx-auto">
                 {% comment %} TOTAL TASK {% endcomment %}
                 <a href="{% url "manager-dashboard" %}?type=all">
                 <div
@@ -75,7 +30,8 @@
                         <h1 class="font-bold text-2xl pt-3">{{Count.completed_task}} </h1>
                         <p>111 last month</p>
                     </div>
-                    <div class="bg-green-200 rounded-full p-3"><svg
+                    <div class="bg-green-200 rounded-full p-3">
+                        <svg
                             xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-6">
@@ -125,7 +81,4 @@
             {% block tasks %}
 
             {% endblock tasks %}
-        </main>
-        {% include "footer.html" %}
-    </body>
-</html>
+            {% endblock content %}

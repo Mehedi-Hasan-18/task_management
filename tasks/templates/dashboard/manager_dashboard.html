@@ -2,7 +2,7 @@
 {% block title %}Manager Dashboard{% endblock title %}
 {% block tasks %}
 
-<div class="bg-white rounded-lg shadow lg p-4">
+<div class="bg-white rounded-lg shadow lg p-4 w-11/12 mx-auto mb-5">
     <div class="grid grid-cols-4 border-b border-gray-100 text-sm text-gray-500 pb-3">
         <div>TASK TITLE</div>
         <div>PRIORTY</div>
@@ -18,18 +18,13 @@
 
             <div class="flex items-center gap-2">
                 <div class="w-2 h-2 bg-green-600 rounded-full"></div>
-                <div><span>{{task.title}}</span></div>
-                <a class="bg-green-500 text-xl" href=" {% url 'update-task' task.id  %}  ">Edit</a>
-                <form action=" {% url 'delete-task' task.id  %}  " method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="bg-green-500 text-xl">Delete</button>
-                </form>
+                <div><a href="{% url 'task-details' task.id %}">{{task.title}}</a></div>
             </div>
             <div><span class="bg-blue-200 rounded-full text-blue-600 font-bold px-3 py-2 text-sm">{{task.details.get_priority_display}}</span></div>
             <div>
                 <div class="flex -space-x-2">
                     {% for emp in task.assign_to.all %}
-                    <div class="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-sm text-white border-2 border-white">{{emp.name|slice:':1'}}</div>
+                    <div class="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-sm text-white border-2 border-white">{{emp.first_name|slice:':1'}}</div>
                     {% endfor %}
                 </div>
             </div>

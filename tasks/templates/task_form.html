@@ -16,11 +16,11 @@
             {% endfor %}
             {% endif %}
         </div>
-        <form method='POST'>
+        <form method='POST' enctype='multipart/form-data'>
             {% csrf_token %}
             {{task_form.as_p}}
             {{task_Detail.as_p}}
-            <button class="bg-rose-600 px-3 py-2 mt-3 text-white" type="Submit">Submit</button>
+            <button class="bg-rose-600 px-3 py-2 mt-3 text-black" type="Submit">Submit</button>
         </form>
     </div>
 </body>

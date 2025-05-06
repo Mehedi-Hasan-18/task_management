@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+        <div class="w-1/2 mx-auto my-9 text-xl mt-5">
+            {% if messages %}
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            {% endif %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    {{error}}
+                {% endfor %}
+            {% endif %}
+            <form method="POST" >
+                {% csrf_token %}
+                {{form}}
+                <button class="mt-4 p-3 btn bg-blue-400 text-white rounded" type='submit'>Sign In</button>
+            </form>
+        </div>
+        {% endblock content %}
