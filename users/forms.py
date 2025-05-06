@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 from django.contrib.auth.models import User,Group,Permission
 from django import forms
 import re
-from tasks.forms import styleMixin
+from tasks.forms import StyleFormMixin
 
 class RegisterForm(UserCreationForm):
     class Meta:
@@ -16,7 +16,7 @@ class RegisterForm(UserCreationForm):
             self.fields[fieldname].help_text = None
 
 
-class CustomRegisterForm(styleMixin,forms.ModelForm): 
+class CustomRegisterForm(StyleFormMixin,forms.ModelForm): 
     password = forms.CharField(
         widget=forms.PasswordInput,
         help_text="Must contain both letters and numbers (no special characters)"
@@ -66,18 +66,18 @@ class CustomRegisterForm(styleMixin,forms.ModelForm):
         return cleaned_data
     
     
-class CustomSignInForm(styleMixin,AuthenticationForm):
+class CustomSignInForm(StyleFormMixin,AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         
-class AssignRoleForm(styleMixin,forms.Form):
+class AssignRoleForm(StyleFormMixin,forms.Form):
     role = forms.ModelChoiceField(
         queryset= Group.objects.all(),
         empty_label= 'Selete Role--'
     )
     
-class CreateGroupForm(forms.ModelForm):
+class CreateGroupForm(StyleFormMixin,forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
         queryset=Permission.objects.all(),
         widget = forms.CheckboxSelectMultiple,

@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from tasks.forms import TaskForm,TaskModelForm,TaskModelFormPrac,TaskDetailModelForm
-from tasks.models import Employee,Task,TaskDetail,Project
+from tasks.forms import TaskForm,TaskModelForm,TaskDetailModelForm
+from tasks.models import Task,TaskDetail,Project
 from django.db.models import Q,Count
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required,user_passes_test,permission_required
+from users.views import is_admin
 
 # Create your views here.
     #Work with database
@@ -76,14 +77,14 @@ def test(request):
     }
     return render(request,"test.html",context)
 
-@login_required(login_url='signIn')
+@login_required
 @permission_required('tasks.add_task', login_url='signIn')
 def create_task(request):
     task_form = TaskModelForm()
     task_detail_form = TaskDetailModelForm()
     if(request.method == 'POST'):
         task_form = TaskModelForm(request.POST)
-        task_detail_form = TaskDetailModelForm(request.POST)
+        task_detail_form = TaskDetailModelForm(request.POST, request.FILES)
         if task_form.is_valid() and task_detail_form.is_valid():
             """ For Model Form Data"""
             task = task_form.save()
@@ -139,52 +140,40 @@ def delete_task(request,id):
 @login_required
 @permission_required('tasks.add_task', login_url='no-permission')
 def view_task(request):
-    #RETRIVE ALL DATA
-    # tasks = Task.objects.all()
-    
-    #RETRIVE A SPECIFIC DATA
-    # task_1 = Task.objects.get(id=1)
-    
-    #----------FILTER----------#
-    # tasks = Task.objects.filter(status='PENDING')
-    # tasks = Task.objects.exclude(status = 'DONE')
-    
-    #-----SHOW THE TASK THAT CONTAIN "Paper"
-    # tasks = Task.objects.filter(title__icontains='c',status='PENDING')
-    
-    #--------------SHOW TASK WITH OR ------------
-    # tasks = Task.objects.filter(Q(status="PENDING") | Q(status = 'IN_PROGRESS'))
-    
-    # ----------------Select_related(Foreignkey,OneToOneField)---------
-    # tasks = Task.objects.select_related('details').all()
-    # tasks = TaskDetail.objects.select_related('task').all()
     tasks = Task.objects.select_related("project").all()
-    
-    
-    # ------------prefetch_related(reverse Forigkey, manyTomany)------------
-    # tasks = Project.objects.prefetch_related('task_set').all()
-    # tasks = Task.objects.prefetch_related("assign_to").all()
-    
-    # ----------AGGREGATE----------
-    # task_count = Task.objects.aggregate(num_task=Count('id'))
     
     projects = Project.objects.annotate(num_task=Count('task')).order_by('num_task')
     return render(request,'show_task.html',{'projects':projects})
-    # return render(request,'show_task.html',{'tasks':tasks})
 
 
-
-
-
-
-#PRACTICE
-# def create_task_prac(request):
-#     form = TaskModelFormPrac()
-#     if(request.method=='POST'):
-#         form = TaskModelFormPrac(request.POST)
-#         if form.is_valid():
-#             form.save()
-            
-#             return render(request,'task_form_prac.html',{'form':form,'message':'Task Added Succefully'})
-            
-#     return render(request,'task_form_prac.html',{'form':form})
+@login_required
+@permission_required('tasks.add_task', login_url='no-permission')
+def task_details(request,task_id):
+    task = Task.objects.get(id=task_id)
+    status_choice = Task.STATUS_CHOICES
+    
+    if request.method == 'POST':
+        selected_status = request.POST.get('task_status')
+        task.status = selected_status
+        task.save()
+        return redirect('task-details', task_id)
+    
+    return render(request, 'task_details.html' , {'task':task, 'status_choice':status_choice})
+    
+ 
+@login_required   
+def employee_dashboard(request):
+    return render(request,'dashboard/manager_dashboard.html')
+    
+    
+    
+@login_required   
+def dashboard(request):
+    if is_manager(request.user):
+        return redirect('manager-dashboard')
+    elif is_employee(request.user):
+        return redirect('employee_dashboard')
+    elif is_admin(request.user):
+        return redirect('admin_dashboard')
+    else :
+        return redirect('no-permission')

@@ -1,5 +1,6 @@
 from django.urls import path
 from users.views import register,signIn,signOut,active,admin_dashboard,assign_role,create_group,group_list
+from tasks.views import task_details
 urlpatterns = [
     path('register/',register, name='register'),
     path('signIn/',signIn, name='signIn'),
