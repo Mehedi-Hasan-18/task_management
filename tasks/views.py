@@ -5,8 +5,13 @@ from tasks.models import Task,TaskDetail,Project
 from django.db.models import Q,Count
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required,user_passes_test,permission_required
+from django.utils.decorators import method_decorator
 from users.views import is_admin
-
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
+from django.views.generic.base import ContextMixin
+from django.views.generic.list import ListView
+from django.views.generic import DetailView,UpdateView
 # Create your views here.
     #Work with database
     # Transform data
@@ -77,26 +82,63 @@ def test(request):
     }
     return render(request,"test.html",context)
 
-@login_required
-@permission_required('tasks.add_task', login_url='signIn')
-def create_task(request):
-    task_form = TaskModelForm()
-    task_detail_form = TaskDetailModelForm()
-    if(request.method == 'POST'):
-        task_form = TaskModelForm(request.POST)
-        task_detail_form = TaskDetailModelForm(request.POST, request.FILES)
-        if task_form.is_valid() and task_detail_form.is_valid():
-            """ For Model Form Data"""
-            task = task_form.save()
-            task_detail = task_detail_form.save(commit=False)
-            task_detail.task = task
-            task_detail.save()
+# @login_required
+# @permission_required('tasks.add_task', login_url='signIn')
+# def create_task(request):
+#     task_form = TaskModelForm()
+#     task_detail_form = TaskDetailModelForm()
+#     if(request.method == 'POST'):
+#         task_form = TaskModelForm(request.POST)
+#         task_detail_form = TaskDetailModelForm(request.POST, request.FILES)
+#         if task_form.is_valid() and task_detail_form.is_valid():
+#             """ For Model Form Data"""
+#             task = task_form.save()
+#             task_detail = task_detail_form.save(commit=False)
+#             task_detail.task = task
+#             task_detail.save()
             
-            messages.success(request,"TASK CREATED SUCCESSFULLY")
-            return redirect("create-task")
+#             messages.success(request,"TASK CREATED SUCCESSFULLY")
+#             return redirect("create-task")
                 
-    context = {"task_form": task_form,"task_Detail":task_detail_form}
-    return render(request,"task_form.html",context)
+#     context = {"task_form": task_form,"task_Detail":task_detail_form}
+#     return render(request,"task_form.html",context)
+
+"""Class Based View
+    Used Build In Mixin Of Django
+"""
+create_decorator = [login_required,permission_required('tasks.add_task', login_url='signIn')]
+
+@method_decorator(create_decorator,name='dispatch')
+class CreateTask(ContextMixin,LoginRequiredMixin,PermissionRequiredMixin,View):
+    permission_required = 'task.add_task'
+    login_url='signIn'
+    template_name = 'task_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)  
+        context['task_form'] =kwargs.get('task_form',TaskModelForm())
+        context['task_Detail'] =kwargs.get('task_Detail',TaskDetailModelForm())
+        return context
+    
+    
+    def get(self,request,*args,**kwargs):
+        
+        context = self.get_context_data()
+        return render(request,self.template_name,context)
+    
+    def post(self,request,*args,**kwargs):
+        if(request.method == 'POST'):
+            task_form = TaskModelForm(request.POST)
+            task_detail_form = TaskDetailModelForm(request.POST, request.FILES)
+            if task_form.is_valid() and task_detail_form.is_valid():
+                """ For Model Form Data"""
+                task = task_form.save()
+                task_detail = task_detail_form.save(commit=False)
+                task_detail.task = task
+                task_detail.save()
+                messages.success(request,"TASK CREATED SUCCESSFULLY")
+                context = self.get_context_data(task_form=task_form,task_Detail=task_detail_form)
+                return render(request,self.template_name,context)
 
 
 @login_required
@@ -124,6 +166,42 @@ def update_task(request,id):
     context = {"task_form": task_form,"task_Detail":task_detail_form}
     return render(request,"task_form.html",context)
 
+class UpdateTaskView(UpdateView):
+    model = Task
+    form_class = TaskModelForm
+    template_name = 'task_form.html'
+    context_object_name='task'
+    pk_url_kwarg = 'id'
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        context['task_form'] = self.get_form()
+        
+        if hasattr(self.object, 'details') and self.object.details:
+            context['task_Detail'] = TaskDetailModelForm(instance = self.object.details)
+        else:
+            context['task_Detail'] = TaskDetailModelForm()
+            
+        return context
+    
+    def post(self,request,*args,**kwargs):
+        self.object = self.get_object()
+        task_form = TaskModelForm(request.POST, instance = self.object)
+
+        task_Detail = TaskDetailModelForm(request.POST,request.FILES, instance=getattr(self.object, 'details' , None))
+
+        if task_form.is_valid() and task_Detail.is_valid():
+            task = task_form.save()
+            task_detail = task_Detail.save(commit=False)
+            task_detail.task = task
+            task_detail.save()
+            
+            messages.success(request,"TASK UPDATED SUCCESSFULLY")
+            return redirect("update-task",self.object.id)
+        
+        return redirect('update-task', self.object.id)
+    
+
 @login_required
 @permission_required('tasks.add_task', login_url='no-permission')
 def delete_task(request,id):
@@ -145,6 +223,18 @@ def view_task(request):
     projects = Project.objects.annotate(num_task=Count('task')).order_by('num_task')
     return render(request,'show_task.html',{'projects':projects})
 
+view_project_decorator = [login_required,permission_required('projects.view_project', login_url='signIn')]
+
+@method_decorator(view_project_decorator,name='dispatch')
+class ViewProject(ListView):
+    model=Project
+    context_object_name = 'projects'
+    template_name ='show_task.html'
+    
+    def get_queryset(self):
+        queryset = Project.objects.annotate(num_task=Count('task')).order_by('num_task')
+        return queryset
+
 
 @login_required
 @permission_required('tasks.add_task', login_url='no-permission')
@@ -159,8 +249,31 @@ def task_details(request,task_id):
         return redirect('task-details', task_id)
     
     return render(request, 'task_details.html' , {'task':task, 'status_choice':status_choice})
+
+task_details_decorator = [login_required,permission_required('tasks.detail_task', login_url='signIn')]
+
+@method_decorator(task_details_decorator,name='dispatch')  
+class TaskDetailView(DetailView):
+    model = Task
+    context_object_name = 'task' 
+    template_name = 'task_details.html'
+    pk_url_kwarg = 'task_id'
     
- 
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        context['status_choice'] = Task.STATUS_CHOICES
+        return context
+    
+    def post(self,request,*args,**kwargs):
+        task = self.get_object()
+        selected_status = request.POST.get('task_status')
+        task.status = selected_status
+        task.save()
+        return redirect('task-details', task.id)
+    
+    
+    
+    
 @login_required   
 def employee_dashboard(request):
     return render(request,'dashboard/manager_dashboard.html')

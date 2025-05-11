@@ -6,6 +6,19 @@ from tasks.models import Task
 
 
 # SIGNALS 
+
+from django.db.models.signals import post_save,pre_save,post_delete,pre_delete
+from django.dispatch import receiver
+from django.db.models.signals import m2m_changed
+from django.contrib.auth.models import User,Group
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.conf import settings
+
+
+
+
+
 @receiver(post_save,sender=Task)
 def notify(sender,instance,created,**kwargs):
     if created:

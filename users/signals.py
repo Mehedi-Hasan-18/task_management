@@ -1,10 +1,10 @@
-from django.db.models.signals import post_save,pre_save,post_delete,pre_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db.models.signals import m2m_changed
-from django.contrib.auth.models import User,Group
-from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.models import User, Group
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+
 
 @receiver(post_save,sender=User)
 def user_activation_email(sender,instance,created,**kwargs):
@@ -27,4 +27,3 @@ def assign_task(sender,instance,created,**kwargs):
         user_group,created = Group.objects.get_or_create(name="User Group")
         instance.groups.add(user_group)
         instance.save()
-        
