@@ -16,6 +16,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+AUTH_USER_MODEL = 'users.CustomUser'
 
 
 # Application definition
@@ -118,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kuala_Lumpur'
 
 USE_I18N = True
 
@@ -151,6 +152,8 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 FRONTEND_URL = 'http://127.0.0.1:8000/'
 
-LOGIN_URL = 'signIn'
+LOGIN_URL = '/users/signIn/'
+LOGIN_REDIRECT_URL = '/tasks/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 

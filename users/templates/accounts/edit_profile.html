@@ -11,11 +11,10 @@
                     {{error}}
                 {% endfor %}
             {% endif %}
-            <form method="POST" >
+            <form method="POST" enctype= 'multipart/form-data'>
                 {% csrf_token %}
                 {{form}}
-                <button class="mt-4 p-3 btn bg-blue-400 text-white rounded" type='submit'>Sign In</button><br>
-                <a href="{% url "password_reset" %}">Forget Password?</a>
+                <button class="mt-4 p-3 btn bg-blue-400 text-white rounded" type='submit'>Submit</button><br>
             </form>
         </div>
         {% endblock content %}
