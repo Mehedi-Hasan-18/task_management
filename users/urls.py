@@ -3,8 +3,6 @@ from users.views import admin_dashboard,group_list,CustomLoginView,ProfileView,C
 from django.contrib.auth.views import LogoutView,PasswordChangeDoneView
 
 
-
-
 urlpatterns = [
     path('register/',RegisterView.as_view(), name='register'),
     path('signIn/',CustomLoginView.as_view(template_name='registers/signin.html'), name='signIn'),
